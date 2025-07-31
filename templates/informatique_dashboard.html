@@ -1,0 +1,20 @@
+<h2>Demandes à traiter</h2>
+<table>
+    <tr>
+        <th>ID</th><th>Demandeur</th><th>Email</th><th>Date</th><th>Objet</th><th>Action</th>
+    </tr>
+    {% for d in demandes %}
+    <tr>
+        <td>{{ d[0] }}</td>
+        <td>{{ d[3] }} {{ d[4] }}</td>
+        <td>{{ d[5] }}</td>
+        <td>{{ d[2] }}</td>
+        <td>{{ d[1] }}</td>
+        <td>
+            <form method="post" action="{{ url_for('traite_request', request_id=d[0]) }}">
+                <button type="submit">Marquer comme traité</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

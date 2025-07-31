@@ -1,0 +1,256 @@
+:root { 
+    --primary-color: #117A65;
+    --accent-color: #E07A5F;
+    --background-color: #F4F1DE;
+    --text-color: #333333;
+    --medium-gray: #8E8D8A;
+    --success-color: #4CAF50;
+    --warning-color: #F44336;
+    --white: #FFFFFF;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  .biat-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: var(--white);
+    box-shadow: 0 0 30px rgba(17, 122, 101, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .biat-header {
+    background-color: var(--primary-color);
+    padding: 25px 30px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .biat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logout-btn {
+    background-color: var(--accent-color);
+    border: none;
+    color: var(--white);
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  .logout-btn:hover {
+    background-color: #c35b4a;
+  }
+  
+  .biat-logo {
+    height: 60px;
+    margin-bottom: 15px;
+  }
+  
+  .biat-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  
+  .biat-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.9;
+  }
+  
+  .biat-form-section {
+    padding: 30px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .biat-section-title {
+    color: var(--primary-color);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #C9E4DE;
+  }
+  
+  .biat-form-group {
+    margin-bottom: 20px;
+  }
+  
+  .biat-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+  }
+  
+  .biat-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s;
+  }
+  
+  .biat-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 6px 3px rgba(17, 122, 101, 0.2);
+  }
+  
+  .biat-radio-group, .biat-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .biat-radio, .biat-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  .biat-system-card {
+    background: var(--white);
+    border-left: 4px solid var(--primary-color);
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  .biat-system-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .biat-system-name {
+    font-weight: 600;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+  }
+  
+  .biat-env-selector {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .biat-env-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  .biat-profiles {
+    margin-left: 25px;
+    margin-top: 10px;
+    display: none;
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  .biat-signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+  
+  .biat-signature {
+    width: 45%;
+  }
+  
+  .biat-signature-line {
+    height: 1px;
+    background-color: #333;
+    margin-top: 30px;
+  }
+  
+  .biat-submit-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .biat-submit-btn:hover {
+    background-color: #0E6655;
+    transform: translateY(-2px);
+  }
+  
+  .biat-required:after {
+    content: " *";
+    color: var(--accent-color);
+  }
+  
+  @media (max-width: 768px) {
+    .biat-container {
+      margin: 0;
+      border-radius: 0;
+    }
+  
+    .biat-form-section {
+      padding: 20px;
+    }
+  
+    .biat-env-selector {
+      flex-direction: column;
+      gap: 8px;
+    }
+  
+    .biat-signature-section {
+      flex-direction: column;
+      gap: 30px;
+    }
+  
+    .biat-signature {
+      width: 100%;
+    }
+  }

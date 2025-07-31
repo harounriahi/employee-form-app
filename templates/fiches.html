@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des demandes - Assurances BIAT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ASSURANCES BIAT</h1>
+            <h2>LISTE DES DEMANDES D'ACCÈS</h2>
+        </header>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Service</th>
+                    <th>Accès Réseaux</th>
+                    <th>ARIMA BO</th>
+                    <th>ARIMA FO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demande in demandes %}
+                <tr>
+                    <td>{{ demande.date }}</td>
+                    <td>{{ demande.nom }}</td>
+                    <td>{{ demande.prenom }}</td>
+                    <td>{{ demande.service }}</td>
+                    <td>{{ demande.reseaux }}</td>
+                    <td>{{ demande.arima_bo }}</td>
+                    <td>{{ demande.arima_fo }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">Aucune demande enregistrée</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('form') }}" class="back-link">Nouvelle demande</a>
+    </div>
+</body>
+</html>

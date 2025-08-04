@@ -188,15 +188,34 @@ init_db()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # --- TEMP: Commented out role restriction so anyone can register for testing ---
+    # if 'user' not in session:
+    #     return redirect(url_for('login'))
+
+    # with sqlite3.connect(DATABASE) as conn:
+    #     cursor = conn.cursor()
+    #     cursor.execute("SELECT role FROM users WHERE email = ?", (session['user'],))
+    #     row = cursor.fetchone()
+    #     if not row or row[0] != "informatique":
+    #         flash("Seuls les informaticiens peuvent créer des comptes.", "danger")
+    #         return redirect(url_for('dashboard'))
+    # --- END TEMP ---
+
     if request.method == 'POST':
         nom = request.form['nom'].strip()
         prenom = request.form['prenom'].strip()
         email = request.form['email'].strip().lower()
         departement = request.form['departement'].strip()
         pole = request.form['pole'].strip()
+        role = request.form.get('role')
+
+        # Validate role
+        if role not in ["responsable", "validateur", "informatique"]:
+            flash("Rôle invalide.", "danger")
+            return redirect(url_for('register'))
+
         password = generate_password()
         hashed_password = generate_password_hash(password)
-        role = request.form.get('role', 'user')  # Default role: user
 
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
@@ -225,7 +244,7 @@ def register():
                 conn.commit()
                 send_password_email(email, password)
                 flash("Compte créé. Un mot de passe a été envoyé par email.", "success")
-                return redirect(url_for('login'))
+                return redirect(url_for('dashboard'))
             except sqlite3.IntegrityError:
                 flash("Un utilisateur avec cet email existe déjà.", "danger")
                 return redirect(url_for('register'))
@@ -233,7 +252,6 @@ def register():
                 print("[REGISTER ERROR]", e)
                 flash("Erreur serveur lors de la création du compte.", "danger")
                 return redirect(url_for('register'))
-
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -243,23 +261,30 @@ def login():
         password = request.form.get('password', '')
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT password FROM users WHERE email = ?', (email,))
+            cursor.execute('SELECT password, role, nom, prenom FROM users WHERE email = ?', (email,))
             row = cursor.fetchone()
         if row and check_password_hash(row[0], password):
             session.permanent = True
             session['user'] = email
+            session['role'] = row[1]
+            session['user_name'] = f"{row[2]} {row[3]}"
             flash("Connexion réussie.", "success")
+            # Always redirect to the form after login
             return redirect(url_for('form'))
         else:
             flash("Email ou mot de passe incorrect.", "danger")
             return redirect(url_for('login'))
     return render_template('login.html')
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session.pop('user', None)
-    flash("Vous avez été déconnecté.", "info")
+    session.clear()
     return redirect(url_for('login'))
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', role=session.get('role'), user_name=session.get('user_name'))
 
 @app.route('/')
 def form():

@@ -123,6 +123,14 @@
 
       <label for="pole">Pôle</label>
       <input type="text" id="pole" name="pole" required />
+      <!-- Add this inside your <form> in register.html, before the submit button -->
+      <label for="role">Rôle</label>
+      <select id="role" name="role" required>
+        <option value="">-- Choisir un rôle --</option>
+        <option value="responsable">Responsable</option>
+        <option value="validateur">Validateur</option>
+        <option value="informatique">Informaticien</option>
+      </select>
 
       <button type="submit">Créer le compte</button>
     </form>

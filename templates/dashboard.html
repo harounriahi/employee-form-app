@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background: #f8f9f3;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .dashboard-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 0 0 32px 0;
+        }
+        .dashboard-header {
+            background: #40806b;
+            border-radius: 12px 12px 0 0;
+            padding: 32px 32px 16px 32px;
+            color: #fff;
+            text-align: left;
+        }
+        .dashboard-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+        .user-info {
+            margin: 16px 32px 0 32px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        .role-links {
+            margin: 24px 32px 0 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e3e3e3;
+            font-size: 1.06rem;
+        }
+        .role-links a {
+            color: #40806b;
+            font-weight: 500;
+            text-decoration: none;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .role-links a:hover {
+            color: #21513c;
+            text-decoration: underline;
+        }
+        .dashboard-main {
+            margin: 32px 32px 0 32px;
+        }
+        .logout-btn {
+            float: right;
+            color: #fff;
+            background: #40806b;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 18px;
+            font-size: 0.96rem;
+            cursor: pointer;
+            margin-top: -6px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: #21513c;
+        }
+        @media (max-width: 700px) {
+            .dashboard-container {
+                max-width: 96vw;
+                margin: 16px;
+            }
+            .dashboard-header, .user-info, .role-links, .dashboard-main {
+                margin-left: 12px;
+                margin-right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Bienvenue, {{ user_name or "Utilisateur" }}</h2>
+            <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
+                <button type="submit" class="logout-btn">Déconnexion</button>
+            </form>
+        </div>
+        <div class="user-info">
+            <strong>Rôle :</strong>
+            {% if role == "informatique" %}
+                Informaticien
+            {% elif role == "validateur" %}
+                Validateur
+            {% elif role == "responsable" %}
+                Responsable
+            {% else %}
+                Inconnu
+            {% endif %}
+        </div>
+        <div class="role-links">
+            <a href="{{ url_for('form') }}">Formulaire de gestion des droits d'accès</a>
+            {% if role in ['validateur', 'informatique'] %}
+                | <a href="{{ url_for('mes_demandes') }}">Demandes d'accès</a>
+            {% endif %}
+            {% if role == 'informatique' %}
+                | <a href="{{ url_for('register') }}">Ajouter un utilisateur</a>
+            {% endif %}
+        </div>
+        <div class="dashboard-main">
+            <p>
+                Ceci est votre tableau de bord.<br>
+                Utilisez les liens ci-dessus pour accéder aux différentes fonctionnalités selon votre rôle.
+            </p>
+            {% if role == "informatique" %}
+                <ul>
+                    <li>Créer et gérer des utilisateurs</li>
+                    <li>Consulter toutes les demandes d'accès</li>
+                    <li>Soumettre un formulaire comme tout utilisateur</li>
+                </ul>
+            {% elif role == "validateur" %}
+                <ul>
+                    <li>Consulter et valider les demandes d'accès</li>
+                    <li>Soumettre un formulaire de demande</li>
+                </ul>
+            {% elif role == "responsable" %}
+                <ul>
+                    <li>Soumettre un formulaire de demande d'accès</li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

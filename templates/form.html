@@ -15,7 +15,15 @@
       </div>
       <div class="biat-header-center">
         <h1 class="biat-title">DEMANDE D'ACCÈS SYSTÈME</h1>
-        <p class="biat-subtitle">Formulaire de gestion des droits d'accès</p>
+        <p class="biat-subtitle">
+          <a href="{{ url_for('form') }}">Formulaire de gestion des droits d'accès</a>
+          {% if session.get('role') in ['validateur', 'informatique'] %}
+            | <a href="{{ url_for('mes_demandes') }}">Demandes d'accès</a>
+          {% endif %}
+          {% if session.get('role') == 'informatique' %}
+            | <a href="{{ url_for('register') }}">Ajouter un utilisateur</a>
+          {% endif %}
+        </p>
       </div>
       <div class="biat-header-right" style="display: flex; align-items: center; gap: 15px; color: var(--white); font-weight: 600;">
         <span>{{ session.get('user') or 'Invité' }}</span>

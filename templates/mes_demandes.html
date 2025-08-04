@@ -5,87 +5,185 @@
     <title>Demandes d'accès</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        body { background: #f8f9f3; font-family: 'Segoe UI', Arial, sans-serif; }
-        .container { max-width: 950px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 32px; }
-        h2 { color: #40806b; margin-bottom: 20px; }
-        .role-links { margin-bottom: 18px; }
-        .role-links a { color: #40806b; margin-right: 18px; text-decoration: none; font-weight: 500; }
-        .role-links a:hover { text-decoration: underline; }
-        table { border-collapse: collapse; width: 100%; background: #fafafc; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #ececec; }
-        th { background: #e6f2ed; color: #21513c; }
-        tr:hover { background: #f1f8f6; }
-        .status-pending { color: #e67e22; font-weight: bold; }
-        .status-approved { color: #2ecc71; font-weight: bold; }
-        .status-rejected { color: #e74c3c; font-weight: bold; }
-        .action-btn, .cloture-btn { background: #40806b; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer; margin-right: 6px; }
-        .action-btn.reject { background: #e74c3c; }
-        .cloture-btn { background: #888; }
-        .action-btn:disabled, .cloture-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        body {
+            background: #f7f9fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .container {
+            max-width: 1050px;
+            margin: 40px auto 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            padding: 34px 38px 30px 38px;
+        }
+        h2 {
+            color: #195a4c;
+            margin-bottom: 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .role-links {
+            margin-bottom: 24px;
+        }
+        .role-links a {
+            color: #195a4c;
+            margin-right: 22px;
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+        }
+        .role-links a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #f9f9fb;
+            font-size: 15px;
+        }
+        th, td {
+            padding: 13px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e0ece8;
+        }
+        th {
+            background: #eaf6f3;
+            color: #195a4c;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        tr:hover {
+            background: #f3faf7;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 16px;
+            padding: 3px 12px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .status-soumis {
+            background: #fff2e0;
+            color: #e67e22;
+        }
+        .status-traitement {
+            background: #e6f3fd;
+            color: #2980b9;
+        }
+        .status-traite {
+            background: #eafbe7;
+            color: #2ecc71;
+        }
+        .status-rejete {
+            background: #fdeaea;
+            color: #e74c3c;
+        }
+        .status-cloture {
+            background: #e0e0e0;
+            color: #7c7c7c;
+        }
+        .action-btn, .cloture-btn {
+            background: #195a4c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            cursor: pointer;
+            margin-right: 6px;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+        .action-btn.reject {
+            background: #e74c3c;
+        }
+        .cloture-btn {
+            background: #888;
+        }
+        .action-btn:disabled, .cloture-btn:disabled {
+            opacity: 0.48;
+            cursor: not-allowed;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 12px 3vw; }
+            th, td { font-size: 13px; padding: 9px 3px; }
+            h2 { font-size: 20px; }
+            .role-links { font-size: 13px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Demandes d'accès</h2>
+        <h2>Les demandes d'accès</h2>
         <div class="role-links">
-            <a href="{{ url_for('form') }}">Formulaire de gestion des droits d'accès</a>
-            {% if role in ['validateur', 'informatique'] %}
-                | <a href="{{ url_for('mes_demandes') }}">Demandes d'accès</a>
+            <a href="{{ url_for('form') }}">Faire une demande</a>
+            {% if session['role'] in ['responsable', 'validateur', 'informatique'] %}
+                | <a href="{{ url_for('mes_demandes') }}">Voir mes demandes</a>
             {% endif %}
-            {% if role == 'informatique' %}
+            {% if session['role'] == 'informatique' %}
                 | <a href="{{ url_for('register') }}">Ajouter un utilisateur</a>
             {% endif %}
         </div>
 
-        {% if demandes %}
+        {% if demandes_with_history and demandes_with_history|length > 0 %}
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Demandeur</th>
+                        <th>Objet</th>
                         <th>Date</th>
                         <th>Statut</th>
-                        <th>Motif</th>
-                        <th>Actions</th>
+                        <th>Motif de rejet</th>
+                        <th>Historique</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for d in demandes %}
+                    {% for dwh in demandes_with_history %}
+                    {% set d = dwh.demande %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{ d.demandeur }}</td>
-                        <td>{{ d.date }}</td>
+                        <td>{{ d[1] }}</td>
+                        <td>{{ d[2] }}</td>
                         <td>
-                            {% if d.statut == 'En attente' %}
-                                <span class="status-pending">{{ d.statut }}</span>
-                            {% elif d.statut == 'Validée' %}
-                                <span class="status-approved">{{ d.statut }}</span>
-                            {% elif d.statut == 'Clôturée' %}
-                                <span class="status-approved" style="color:#888">{{ d.statut }}</span>
+                            {# Status mapping and badge #}
+                            {% set status = d[7] %}
+                            {% if status == 'soumis' %}
+                                <span class="status-badge status-soumis" title="En attente de validation &#x23F3;">&#x23F3; Soumis</span>
+                            {% elif status == 'en traitement' %}
+                                <span class="status-badge status-traitement" title="En cours de traitement">&#9889; En traitement</span>
+                            {% elif status == 'traité' %}
+                                <span class="status-badge status-traite" title="Demande traitée">&#10003; Traité</span>
+                            {% elif status == 'rejeté' %}
+                                <span class="status-badge status-rejete" title="Demande rejetée">&#10060; Rejeté</span>
+                            {% elif status == 'clôturé' %}
+                                <span class="status-badge status-cloture" title="Demande clôturée">&#128274; Clôturé</span>
                             {% else %}
-                                <span class="status-rejected">{{ d.statut }}</span>
+                                <span class="status-badge">{{ status|capitalize }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ d.motif }}</td>
                         <td>
-                            {% if role in ['validateur', 'informatique'] and d.statut == 'En attente' %}
-                                <form method="post" action="{{ url_for('valider_demande', id=d.id) }}" style="display:inline;">
-                                    <button type="submit" class="action-btn">Valider</button>
-                                </form>
-                                <form method="post" action="{{ url_for('rejeter_demande', id=d.id) }}" style="display:inline;">
-                                    <button type="submit" class="action-btn reject">Rejeter</button>
-                                </form>
-                            {% elif role == 'informatique' and d.statut == 'Validée' %}
-                                <form method="post" action="{{ url_for('cloturer_demande', id=d.id) }}" style="display:inline;">
-                                    <button type="submit" class="cloture-btn">Clôturer</button>
-                                </form>
+                            {% if d[8] %}
+                                <span title="{{ d[8] }}">{{ d[8] }}</span>
                             {% else %}
-                                <button class="action-btn" disabled>Valider</button>
-                                <button class="action-btn reject" disabled>Rejeter</button>
-                                {% if role == 'informatique' %}
-                                    <button class="cloture-btn" disabled>Clôturer</button>
-                                {% endif %}
+                                -
                             {% endif %}
+                        </td>
+                        <td>
+                            <details>
+                                <summary style="cursor:pointer; color:#195a4c;">Voir</summary>
+                                <ul style="margin:0; padding-left:15px; font-size:13px;">
+                                {% for h in dwh.history %}
+                                    <li>
+                                        <b>{{ h.action|capitalize }}</b>
+                                        {% if h.comment %} - <i>{{ h.comment }}</i>{% endif %}
+                                        <br>
+                                        <span style="color:#888;">{{ h.timestamp }} par {{ h.actor }}</span>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </details>
                         </td>
                     </tr>
                     {% endfor %}

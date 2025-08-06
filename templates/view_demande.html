@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>ASSURANCES BIAT - Consultation Demande d'accès</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/biat-form.css') }}">
+  <style>
+    input[readonly], input[disabled], select[disabled], textarea[readonly], textarea[disabled] {
+      background-color: #f3f3f3 !important;
+      color: #888 !important;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .biat-submit-btn {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="biat-container">
+    <div class="biat-header">
+      <div class="biat-header-left">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Assurances BIAT" class="biat-logo" />
+      </div>
+      <div class="biat-header-center">
+        <h1 class="biat-title">CONSULTATION DEMANDE D'ACCÈS SYSTÈME</h1>
+      </div>
+      <div class="biat-header-right">
+        <span>{{ session.get('user') or 'Invité' }}</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a>
+      </div>
+    </div>
+
+    <form>
+      <fieldset disabled>
+      <!-- Section Informations de base -->
+      <div class="biat-form-section">
+        <h3 class="biat-section-title">Informations générales</h3>
+        <div class="biat-form-group">
+          <label class="biat-label biat-required">Objet de la demande</label>
+          <div class="biat-radio-group" style="flex-direction: column; gap: 8px;">
+            {% for v in ['Octroi de nouveaux droits', 'Modification - ajout', 'Modification - suppression', 'Mutation', 'Départ'] %}
+              <label class="biat-radio">
+                <input type="radio" name="objet_demande" value="{{ v }}" {% if demande.objet_demande == v %}checked{% endif %}> {{ v }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="biat-form-group">
+          <label class="biat-label biat-required">Date de la demande</label>
+          <input type="date" name="date_demande" class="biat-input" value="{{ demande.date_demande }}">
+        </div>
+        <div class="biat-form-group">
+          <label class="biat-label">Demandeur</label>
+          <input type="text" class="biat-input" value="{{ demande.demandeur }}">
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="biat-form-group">
+              <label class="biat-label biat-required">Département</label>
+              <input type="text" name="departement" class="biat-input" value="{{ demande.departement }}">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="biat-form-group">
+              <label class="biat-label biat-required">Pôle</label>
+              <input type="text" name="pole" class="biat-input" value="{{ demande.pole }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Utilisateur -->
+      <div class="biat-form-section">
+        <h3 class="biat-section-title">Informations utilisateur</h3>
+        <div class="biat-form-group">
+          <label class="biat-label biat-required">Type de collaborateur</label>
+          <div class="biat-radio-group">
+            {% for v, label in [('interne', 'Interne'), ('stagiaire', 'Stagiaire'), ('externe', 'Prestataire/Externe')] %}
+              <label class="biat-radio">
+                <input type="radio" name="collaborator_type" value="{{ v }}" {% if demande.collaborator_type == v %}checked{% endif %}>
+                {{ label }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% if demande.collaborator_type == 'stagiaire' %}
+        <div id="stageCard">
+          <div class="biat-form-group">
+            <label class="biat-label">Date de début de stage</label>
+            <input type="date" name="date_debut_stage" class="biat-input" value="{{ demande.date_debut_stage }}">
+          </div>
+          <div class="biat-form-group">
+            <label class="biat-label">Date de fin de stage</label>
+            <input type="date" name="date_fin_stage" class="biat-input" value="{{ demande.date_fin_stage }}">
+          </div>
+        </div>
+        {% endif %}
+        <div class="biat-form-group">
+          <label class="biat-label biat-required">Nom complet</label>
+          <input type="text" name="nom_complet" class="biat-input" value="{{ demande.nom_complet }}">
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="biat-form-group">
+              <label class="biat-label biat-required">Matricule</label>
+              <input type="text" name="matricule" class="biat-input" value="{{ demande.matricule }}">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="biat-form-group">
+              <label class="biat-label biat-required">Email professionnel</label>
+              <input type="email" name="email" class="biat-input" value="{{ demande.email }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Branches -->
+      <div class="biat-form-section">
+        <h3 class="biat-section-title">Branches concernées</h3>
+        <div class="biat-checkbox-group">
+          {% for b in all_branches %}
+            <label class="biat-checkbox">
+              <input type="checkbox" {% if b in demande.branches %}checked{% endif %} disabled>
+              {{ b }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Section Systèmes d'information -->
+      <div class="biat-form-section">
+        <h3 class="biat-section-title">Systèmes d'information</h3>
+        <div id="sousType">
+          {% for branche, profiles in demande.profils_env.items() %}
+            <div class="biat-system-card mb-3">
+              <div class="biat-system-header">
+                <strong>{{ branche }}</strong>
+              </div>
+              {% for profile, envs in profiles.items() %}
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <label class="me-3">{{ profile }}</label>
+                  <div class="d-flex gap-3">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" {% if 'TEST' in envs %}checked{% endif %} disabled>
+                      <label class="form-check-label">TEST</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" {% if 'PROD' in envs %}checked{% endif %} disabled>
+                      <label class="form-check-label">PROD</label>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Section Accès Réseaux -->
+      <div class="biat-form-section">
+        <h3 class="biat-section-title">Accès réseaux</h3>
+        <div class="biat-checkbox-group">
+          {% for net in all_network_accesses %}
+            <label class="biat-checkbox">
+              <input type="checkbox" {% if net in demande.network_access %}checked{% endif %} disabled>
+              {{ net }}
+            </label>
+          {% endfor %}
+        </div>
+        <div class="biat-form-group" style="margin-top: 20px;">
+          <label class="biat-label">Accès partagés (précisez si nécessaire)</label>
+          <input type="text" name="acces_partages" class="biat-input" value="{{ demande.acces_partages }}">
+        </div>
+      </div>
+      </fieldset>
+    </form>
+
+    <!-- Affichage du statut de la demande -->
+    <div class="mt-4">
+      <strong>Statut de la demande :</strong>
+      {% if demande.status == 'validé' %}
+        <span class="badge bg-success">Validée</span>
+      {% elif demande.status == 'cloturée' %}
+        <span class="badge bg-secondary">Clôturée</span>
+      {% elif demande.status == 'rejeté' %}
+        <span class="badge bg-danger">Rejetée</span>
+        {% if demande.rejection_comment %}
+          <div class="alert alert-warning mt-2">
+            Raison du rejet : {{ demande.rejection_comment }}
+          </div>
+        {% endif %}
+      {% elif demande.status == 'soumis' %}
+        <span class="badge bg-warning text-dark">Soumise</span>
+      {% elif demande.status == 'traité' %}
+        <span class="badge bg-info text-dark">Traitée</span>
+      {% elif demande.status == 'en traitement' %}
+        <span class="badge bg-primary">En traitement</span>
+      {% else %}
+        <span class="badge bg-light text-dark">{{ demande.status }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Boutons d'action selon le rôle -->
+    <div class="mt-4">
+      {% if session.get('role') == 'responsable' and demande.status == 'soumis' %}
+        <form method="POST" action="{{ url_for('validate_request', request_id=demande.id) }}" style="display:inline;">
+          <button type="submit" name="action" value="valider" class="btn btn-success">Valider</button>
+        </form>
+        <form method="POST" action="{{ url_for('validate_request', request_id=demande.id) }}" style="display:inline;">
+          <input type="text" name="comment" placeholder="Motif du rejet" class="form-control d-inline-block w-auto" />
+          <button type="submit" name="action" value="rejeter" class="btn btn-danger">Rejeter</button>
+        </form>
+      {% elif session.get('role') == 'informatique' and demande.status == 'validé' %}
+        <form method="POST" action="{{ url_for('traite_request', request_id=demande.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-primary">Marquer comme traitée</button>
+        </form>
+        <form method="POST" action="{{ url_for('cloturer_request', request_id=demande.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-secondary">Clôturer</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

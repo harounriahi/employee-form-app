@@ -151,28 +151,30 @@
                         <th>Statut</th>
                         <th>Motif de rejet</th>
                         <th>Historique</th>
-                        <th>Voir</th> <!-- New column for View -->
+                        <th>Voir</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for dwh in demandes_with_history %}
                     {% set d = dwh.demande %}
+                    {% set status = d[7]|lower %}
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td>{{ d[1] }}</td>
                         <td>{{ d[2] }}</td>
                         <td>
                             {# Status mapping and badge #}
-                            {% set status = d[7] %}
                             {% if status == 'soumis' %}
                                 <span class="status-badge status-soumis" title="En attente de validation &#x23F3;">&#x23F3; Soumis</span>
                             {% elif status == 'en traitement' %}
                                 <span class="status-badge status-traitement" title="En cours de traitement">&#9889; En traitement</span>
                             {% elif status == 'traité' %}
                                 <span class="status-badge status-traite" title="Demande traitée">&#10003; Traité</span>
+                            {% elif status == 'validé' %}
+                                <span class="status-badge status-traite" title="Demande validée">&#10003; Validée</span>
                             {% elif status == 'rejeté' %}
                                 <span class="status-badge status-rejete" title="Demande rejetée">&#10060; Rejeté</span>
-                            {% elif status == 'clôturé' %}
+                            {% elif status in ['cloture', 'cloturée', 'clôturée'] %}
                                 <span class="status-badge status-cloture" title="Demande clôturée">&#128274; Clôturé</span>
                             {% else %}
                                 <span class="status-badge">{{ status|capitalize }}</span>

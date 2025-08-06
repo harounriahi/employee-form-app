@@ -735,7 +735,7 @@ def responsable_requests():
         cursor = conn.cursor()
         cursor.execute("SELECT id, role FROM users WHERE email=?", (email,))
         user_row = cursor.fetchone()
-        if not user_row or user_row[1] != 'responsable':
+        if not user_row or user_row[1] not in ['responsable', 'informatique', 'validateur']:
             flash("Accès refusé.", "danger")
             return redirect(url_for('form'))
         responsable_id = user_row[0]
@@ -757,35 +757,36 @@ def validate_request(request_id):
         cursor = conn.cursor()
         cursor.execute("SELECT id, role FROM users WHERE email=?", (email,))
         user_row = cursor.fetchone()
-        if not user_row or user_row[1] != 'responsable':
+        # ALLOW responsable, validateur, informatique to validate
+        if not user_row or user_row[1] not in ['responsable', 'informatique', 'validateur']:
             flash("Accès refusé.", "danger")
             return redirect(url_for('form'))
-        responsable_id = user_row[0]
-
+        validator_id = user_row[0]
         action = request.form.get('action')
         comment = request.form.get('comment', '')
 
         if action == 'valider':
             cursor.execute("UPDATE requests SET status=? WHERE id=?", ('validé', request_id))
-            cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'validé', ?, ?)", (request_id, responsable_id, comment))
-            # Notify informatique
-            cursor.execute("SELECT email FROM users WHERE role='informatique' LIMIT 1")
-            info_email = cursor.fetchone()
-            if info_email:
-                msg_info = EmailMessage()
-                msg_info['Subject'] = 'Nouvelle demande à traiter'
-                msg_info['From'] = 'haroun.riiahii@gmail.com'
-                msg_info['To'] = info_email[0]
-                msg_info.set_content("Une demande est à traiter. Rendez-vous sur la page /informatique/requests.")
-                try:
-                    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                        smtp.login('haroun.riiahii@gmail.com', 'hukreegcgmihoybi')
-                        smtp.send_message(msg_info)
-                except Exception as e:
-                    print("[ERROR] Email to informatique error:", e)
+            cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'validé', ?, ?)", (request_id, validator_id, comment))
+            # Notify informatique if validator is not informatique
+            if user_row[1] != 'informatique':
+                cursor.execute("SELECT email FROM users WHERE role='informatique' LIMIT 1")
+                info_email = cursor.fetchone()
+                if info_email:
+                    msg_info = EmailMessage()
+                    msg_info['Subject'] = 'Nouvelle demande à traiter'
+                    msg_info['From'] = 'haroun.riiahii@gmail.com'
+                    msg_info['To'] = info_email[0]
+                    msg_info.set_content("Une demande est à traiter. Rendez-vous sur la page /informatique/requests.")
+                    try:
+                        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                            smtp.login('haroun.riiahii@gmail.com', 'hukreegcgmihoybi')
+                            smtp.send_message(msg_info)
+                    except Exception as e:
+                        print("[ERROR] Email to informatique error:", e)
         elif action == 'rejeter':
             cursor.execute("UPDATE requests SET status=?, rejection_comment=? WHERE id=?", ('rejeté', comment, request_id))
-            cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'rejeté', ?, ?)", (request_id, responsable_id, comment))
+            cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'rejeté', ?, ?)", (request_id, validator_id, comment))
             # Notify demandeur
             cursor.execute("SELECT u.email FROM requests r JOIN users u ON r.user_id=u.id WHERE r.id=?", (request_id,))
             demandeur_email = cursor.fetchone()
@@ -803,7 +804,7 @@ def validate_request(request_id):
                     print("[ERROR] Email to demandeur error:", e)
         conn.commit()
     flash("Action effectuée.", "success")
-    return redirect(url_for('responsable_requests'))
+    return redirect(url_for('view_demande', request_id=request_id))
 @app.route('/informatique/requests')
 def informatique_requests():
     if 'user' not in session:
@@ -845,7 +846,7 @@ def cloturer_request(request_id):
             cursor.execute("INSERT INTO request_history (request_id, action, actor_id) VALUES (?, 'clôturée', ?)", (request_id, info_id))
         conn.commit()
     flash("Demande clôturée.", "success")
-    return redirect(url_for('informatique_requests'))
+    return redirect(url_for('view_demande', request_id=request_id))
 
 @app.route('/informatique/traite/<int:request_id>', methods=['POST'])
 def traite_request(request_id):
@@ -878,7 +879,7 @@ def traite_request(request_id):
                 print("[ERROR] Email to demandeur error:", e)
         conn.commit()
     flash("Demande marquée comme traitée.", "success")
-    return redirect(url_for('informatique_requests'))
+    return redirect(url_for('view_demande', request_id=request_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

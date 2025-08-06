@@ -11,6 +11,7 @@ import os
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+import json
 
 # === CONFIG ===
 DATABASE = "biat.db"
@@ -326,6 +327,126 @@ def form():
         collaborator_types=collaborator_types,
         network_accesses=network_accesses,
         profiles_dict=profiles_dict
+    )
+@app.route('/demande/<int:request_id>/view')
+def view_demande(request_id):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # Fetch the main request row
+    row = cursor.execute("SELECT * FROM requests WHERE id=?", (request_id,)).fetchone()
+    if not row:
+        flash("Demande introuvable.", "danger")
+        conn.close()
+        return redirect(url_for('mes_demandes'))
+
+    demande = {
+        "id": row[0],
+        "user_id": row[1],
+        "objet_demande": row[2],
+        "date_demande": row[3],
+        "collaborator_type_id": row[4],
+        "date_debut_stage": row[5],
+        "date_fin_stage": row[6],
+        "acces_partages": row[7] or "",
+        "signature": row[8],
+        "status": row[9],
+        "responsable_id": row[10],
+        "rejection_comment": row[11],
+    }
+
+    # Fetch demandeur info
+    cursor.execute("SELECT nom, prenom, email FROM users WHERE id = ?", (demande["user_id"],))
+    user_row = cursor.fetchone()
+    if user_row:
+        demande["nom_complet"] = f"{user_row[0]} {user_row[1]}"
+        demande["demandeur"] = demande["nom_complet"]
+        demande["email"] = user_row[2]
+    else:
+        demande["nom_complet"] = ""
+        demande["demandeur"] = ""
+        demande["email"] = ""
+
+    # Fetch department and pole
+    cursor.execute("""
+        SELECT d.name, p.name
+        FROM users u
+        LEFT JOIN departments d ON u.department_id = d.id
+        LEFT JOIN poles p ON u.pole_id = p.id
+        WHERE u.id = ?
+    """, (demande["user_id"],))
+    dep_pole = cursor.fetchone()
+    demande["departement"] = dep_pole[0] if dep_pole else ""
+    demande["pole"] = dep_pole[1] if dep_pole else ""
+
+    # Collaborator type
+    cursor.execute("SELECT name FROM collaborator_types WHERE id = ?", (demande["collaborator_type_id"],))
+    ct = cursor.fetchone()
+    demande["collaborator_type"] = ct[0] if ct else ""
+
+    # Matricule (if you have it in your users table; otherwise leave blank)
+    demande["matricule"] = ""
+
+    # Branches for this request
+    cursor.execute("""
+        SELECT b.name FROM branches_requests br
+        JOIN branches b ON br.branch_id = b.id
+        WHERE br.request_id = ?
+    """, (request_id,))
+    demande["branches"] = [r[0] for r in cursor.fetchall()]
+
+    # All branches for display
+    cursor.execute("SELECT name FROM branches ORDER BY name")
+    all_branches = [row[0] for row in cursor.fetchall()]
+
+    # Network accesses for this request
+    cursor.execute("""
+        SELECT na.name
+        FROM request_network_accesses rna
+        JOIN network_accesses na ON rna.network_access_id = na.id
+        WHERE rna.request_id = ?
+    """, (request_id,))
+    demande["network_access"] = [r[0] for r in cursor.fetchall()]
+
+    # All network accesses for display
+    cursor.execute("SELECT name FROM network_accesses ORDER BY name")
+    all_network_accesses = [row[0] for row in cursor.fetchall()]
+
+    # Profils_env: {branch: {profile: [envs]}}
+    cursor.execute("""
+        SELECT b.name, s.name, p.name, rsp.environment
+        FROM request_system_profiles rsp
+        JOIN profiles p ON rsp.profile_id = p.id
+        JOIN systems s ON rsp.system_id = s.id
+        JOIN branches b ON p.branch_id = b.id
+        WHERE rsp.request_id = ?
+    """, (request_id,))
+    profils_env = {}
+    for branch, system, profile, env in cursor.fetchall():
+        # Group by branch and system/profile
+        profils_env.setdefault(branch, {}).setdefault(f"{system} - {profile}", []).append(env)
+    demande["profils_env"] = profils_env
+
+    # Make sure all expected fields exist
+    for key in [
+        "objet_demande", "date_demande", "demandeur", "departement", "pole", "collaborator_type",
+        "date_debut_stage", "date_fin_stage", "nom_complet", "matricule", "email",
+        "branches", "profils_env", "network_access", "acces_partages"
+    ]:
+        if key not in demande:
+            if key in ["branches", "network_access"]:
+                demande[key] = []
+            elif key == "profils_env":
+                demande[key] = {}
+            else:
+                demande[key] = ""
+
+    conn.close()
+    return render_template(
+        'view_demande.html',
+        demande=demande,
+        all_branches=all_branches,
+        all_network_accesses=all_network_accesses
     )
 
 @app.route('/submit', methods=['POST'])
@@ -645,7 +766,7 @@ def validate_request(request_id):
         comment = request.form.get('comment', '')
 
         if action == 'valider':
-            cursor.execute("UPDATE requests SET status=? WHERE id=?", ('en traitement', request_id))
+            cursor.execute("UPDATE requests SET status=? WHERE id=?", ('validé', request_id))
             cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'validé', ?, ?)", (request_id, responsable_id, comment))
             # Notify informatique
             cursor.execute("SELECT email FROM users WHERE role='informatique' LIMIT 1")
@@ -706,6 +827,25 @@ def informatique_requests():
         """)
         demandes = cursor.fetchall()
     return render_template('informatique_dashboard.html', demandes=demandes)
+@app.route('/cloturer/<int:request_id>', methods=['POST'])
+def cloturer_request(request_id):
+    if 'user' not in session or session.get('role') != 'informatique':
+        flash("Accès refusé.", "danger")
+        return redirect(url_for('form'))
+    email = session['user']
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        # Mark as closed
+        cursor.execute("UPDATE requests SET status=? WHERE id=?", ('cloturée', request_id))
+        # Add to history
+        cursor.execute("SELECT id FROM users WHERE email=?", (email,))
+        user_row = cursor.fetchone()
+        if user_row:
+            info_id = user_row[0]
+            cursor.execute("INSERT INTO request_history (request_id, action, actor_id) VALUES (?, 'clôturée', ?)", (request_id, info_id))
+        conn.commit()
+    flash("Demande clôturée.", "success")
+    return redirect(url_for('informatique_requests'))
 
 @app.route('/informatique/traite/<int:request_id>', methods=['POST'])
 def traite_request(request_id):

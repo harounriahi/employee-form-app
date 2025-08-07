@@ -353,39 +353,18 @@ def view_demande(request_id):
         "status": row[9],
         "responsable_id": row[10],
         "rejection_comment": row[11],
+        "departement": row[12] or "",
+        "pole": row[13] or "",
+        "nom_complet": row[14] or "",
+        "matricule": row[15] or "",
+        "email": row[16] or ""
     }
+    demande["demandeur"] = demande["nom_complet"]
 
-    # Fetch demandeur info
-    cursor.execute("SELECT nom, prenom, email FROM users WHERE id = ?", (demande["user_id"],))
-    user_row = cursor.fetchone()
-    if user_row:
-        demande["nom_complet"] = f"{user_row[0]} {user_row[1]}"
-        demande["demandeur"] = demande["nom_complet"]
-        demande["email"] = user_row[2]
-    else:
-        demande["nom_complet"] = ""
-        demande["demandeur"] = ""
-        demande["email"] = ""
-
-    # Fetch department and pole
-    cursor.execute("""
-        SELECT d.name, p.name
-        FROM users u
-        LEFT JOIN departments d ON u.department_id = d.id
-        LEFT JOIN poles p ON u.pole_id = p.id
-        WHERE u.id = ?
-    """, (demande["user_id"],))
-    dep_pole = cursor.fetchone()
-    demande["departement"] = dep_pole[0] if dep_pole else ""
-    demande["pole"] = dep_pole[1] if dep_pole else ""
-
-    # Collaborator type
+    # Fetch collaborator type label
     cursor.execute("SELECT name FROM collaborator_types WHERE id = ?", (demande["collaborator_type_id"],))
     ct = cursor.fetchone()
     demande["collaborator_type"] = ct[0] if ct else ""
-
-    # Matricule (if you have it in your users table; otherwise leave blank)
-    demande["matricule"] = ""
 
     # Branches for this request
     cursor.execute("""
@@ -423,7 +402,6 @@ def view_demande(request_id):
     """, (request_id,))
     profils_env = {}
     for branch, system, profile, env in cursor.fetchall():
-        # Group by branch and system/profile
         profils_env.setdefault(branch, {}).setdefault(f"{system} - {profile}", []).append(env)
     demande["profils_env"] = profils_env
 
@@ -479,6 +457,13 @@ def submit():
         signature = request.form.get('signature') or None
         acces_partages = request.form.get('acces_partages') or None
 
+        # NEW: Grab per-request fields from form
+        departement = request.form.get('departement', '')
+        pole = request.form.get('pole', '')
+        nom_complet = request.form.get('nom_complet', '')
+        matricule = request.form.get('matricule', '')
+        email = request.form.get('email', '')
+
         # 3. Get collaborator_type_id
         cursor.execute("SELECT id FROM collaborator_types WHERE name = ?", (collaborator_type,))
         collab_type_row = cursor.fetchone()
@@ -494,10 +479,15 @@ def submit():
         cursor.execute("""
             INSERT INTO requests (
                 user_id, objet_demande, date_demande, collaborator_type_id,
-                date_debut_stage, date_fin_stage, acces_partages, signature
+                date_debut_stage, date_fin_stage, acces_partages, signature, 
+                departement, pole, nom_complet, matricule, email
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (user_id, objet_demande, date_demande, collaborator_type_id, date_debut_stage, date_fin_stage, acces_partages, signature))
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_id, objet_demande, date_demande, collaborator_type_id, 
+            date_debut_stage, date_fin_stage, acces_partages, signature, 
+            departement, pole, nom_complet, matricule, email
+        ))
         request_id = cursor.lastrowid
 
         # 5. Branches
@@ -597,11 +587,11 @@ def submit():
             "Objet de la demande": objet_demande,
             "Date de la demande": date_demande,
             "Type de collaborateur": collaborator_type,
-            "Département": request.form.get('departement', ''),
-            "Pôle": request.form.get('pole', ''),
-            "Nom complet": request.form.get('nom_complet', ''),
-            "Matricule": request.form.get('matricule', ''),
-            "Email": request.form.get('email', ''),
+            "Département": departement,
+            "Pôle": pole,
+            "Nom complet": nom_complet,
+            "Matricule": matricule,
+            "Email": email,
             "Branches": ', '.join(request.form.getlist('branches[]')),
             "Accès partagés": acces_partages if acces_partages else '',
             "Network access": ', '.join(request.form.getlist('network_access[]')),
@@ -630,7 +620,7 @@ def submit():
             print("[ERROR] Email PDF sending error:", e)
 
     flash("Demande enregistrée avec succès!", "success")
-    return redirect(url_for('mes_demandes'))
+    return redirect(url_for('view_demande', request_id=request_id))
 
 @app.route('/success')
 def success():

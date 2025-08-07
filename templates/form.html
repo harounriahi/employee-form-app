@@ -369,13 +369,11 @@
     </form>
   </div>
 
+  <!-- Pass profiles_dict as JSON to JS -->
   <script>
-    function getRandomProfiles() {
-      const count = Math.floor(Math.random() * 3) + 3;
-      let arr = [];
-      for(let i=1; i<=count; i++) arr.push('profile'+i);
-      return arr;
-    }
+    // This must be rendered by Flask as JSON!
+    const profilesDict = {{ profiles_dict | tojson }};
+    const systemsList = Object.values(profilesDict)[0] ? Object.keys(Object.values(profilesDict)[0]) : [];
 
     function updateListe() {
       const sousTypeDiv = document.getElementById("sousType");
@@ -389,37 +387,40 @@
       }
 
       checkedBranches.forEach(branche => {
-        const appId = `${branche}`.replace(/\s+/g, "_");
-        const card = document.createElement("div");
-        card.className = "biat-system-card mb-3";
+        const branchProfilesBySystem = profilesDict[branche];
+        if (!branchProfilesBySystem) return;
 
-        const header = document.createElement("div");
-        header.className = "biat-system-header";
-        header.innerHTML = `<strong>${branche}</strong>`;
-        card.appendChild(header);
+        Object.entries(branchProfilesBySystem).forEach(([system, profiles]) => {
+          const appId = `${branche}_${system}`.replace(/\s+/g, "_");
+          const card = document.createElement("div");
+          card.className = "biat-system-card mb-3";
 
-        const profiles = getRandomProfiles();
+          const header = document.createElement("div");
+          header.className = "biat-system-header";
+          header.innerHTML = `<strong>${branche} - <span style="font-weight:normal;color:#256029">${system}</span></strong>`;
+          card.appendChild(header);
 
-        profiles.forEach(profile => {
-          const row = document.createElement("div");
-          row.className = "d-flex align-items-center justify-content-between mb-2";
-          row.innerHTML = `
-            <label class="me-3">${profile}</label>
-            <div class="d-flex gap-3">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="profils_env[${branche}][${profile}][]" value="TEST" id="${appId}_${profile}_test">
-                <label class="form-check-label" for="${appId}_${profile}_test">TEST</label>
+          profiles.forEach(profile => {
+            const row = document.createElement("div");
+            row.className = "d-flex align-items-center justify-content-between mb-2";
+            row.innerHTML = `
+              <label class="me-3">${profile}</label>
+              <div class="d-flex gap-3">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="profils_env[${branche}][${system}][${profile}][]" value="TEST" id="${appId}_${profile}_test">
+                  <label class="form-check-label" for="${appId}_${profile}_test">TEST</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="profils_env[${branche}][${system}][${profile}][]" value="PROD" id="${appId}_${profile}_prod">
+                  <label class="form-check-label" for="${appId}_${profile}_prod">PROD</label>
+                </div>
               </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="profils_env[${branche}][${profile}][]" value="PROD" id="${appId}_${profile}_prod">
-                <label class="form-check-label" for="${appId}_${profile}_prod">PROD</label>
-              </div>
-            </div>
-          `;
-          card.appendChild(row);
+            `;
+            card.appendChild(row);
+          });
+
+          sousTypeDiv.appendChild(card);
         });
-
-        sousTypeDiv.appendChild(card);
       });
     }
 

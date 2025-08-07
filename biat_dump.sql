@@ -58,6 +58,7 @@ CREATE TABLE collaborator_types (
             name TEXT NOT NULL UNIQUE
         );
 INSERT INTO collaborator_types VALUES(1,'interne');
+INSERT INTO collaborator_types VALUES(2,'externe');
 CREATE TABLE requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -71,9 +72,14 @@ CREATE TABLE requests (
             FOREIGN KEY (user_id) REFERENCES users(id),
             FOREIGN KEY (collaborator_type_id) REFERENCES collaborator_types(id)
         );
-INSERT INTO requests VALUES(1,2,'Octroi de nouveaux droits','2025-08-04',1,NULL,NULL,NULL,NULL,'soumis',4,NULL);
-INSERT INTO requests VALUES(2,2,'Octroi de nouveaux droits','2025-08-04',1,NULL,NULL,NULL,NULL,'soumis',4,NULL);
-INSERT INTO requests VALUES(3,2,'Modification - ajout','2025-08-05',1,NULL,NULL,NULL,NULL,'soumis',4,NULL);
+INSERT INTO requests VALUES(1,2,'Octroi de nouveaux droits','2025-08-04',1,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(2,2,'Octroi de nouveaux droits','2025-08-04',1,NULL,NULL,NULL,NULL,'validé',4,NULL);
+INSERT INTO requests VALUES(3,2,'Modification - ajout','2025-08-05',1,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(4,2,'Octroi de nouveaux droits','2025-08-06',1,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(5,3,'Modification - suppression','2025-08-06',2,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(6,2,'Modification - ajout','2025-08-06',1,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(7,2,'Octroi de nouveaux droits','2025-08-06',1,NULL,NULL,NULL,NULL,'cloturée',4,NULL);
+INSERT INTO requests VALUES(8,2,'Modification - ajout','2025-08-07',1,NULL,NULL,NULL,NULL,'soumis',4,NULL);
 CREATE TABLE branches_requests (
             request_id INTEGER NOT NULL,
             branch_id INTEGER NOT NULL,
@@ -109,6 +115,14 @@ INSERT INTO request_network_accesses VALUES(1,1);
 INSERT INTO request_network_accesses VALUES(2,2);
 INSERT INTO request_network_accesses VALUES(3,2);
 INSERT INTO request_network_accesses VALUES(3,3);
+INSERT INTO request_network_accesses VALUES(4,2);
+INSERT INTO request_network_accesses VALUES(4,1);
+INSERT INTO request_network_accesses VALUES(5,2);
+INSERT INTO request_network_accesses VALUES(5,1);
+INSERT INTO request_network_accesses VALUES(5,3);
+INSERT INTO request_network_accesses VALUES(6,3);
+INSERT INTO request_network_accesses VALUES(7,3);
+INSERT INTO request_network_accesses VALUES(8,1);
 CREATE TABLE request_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             request_id INTEGER NOT NULL,
@@ -122,12 +136,28 @@ CREATE TABLE request_history (
 INSERT INTO request_history VALUES(1,1,'soumis',2,NULL,'2025-08-04 11:00:30');
 INSERT INTO request_history VALUES(2,2,'soumis',2,NULL,'2025-08-04 12:21:37');
 INSERT INTO request_history VALUES(3,3,'soumis',2,NULL,'2025-08-05 13:34:42');
+INSERT INTO request_history VALUES(4,3,'clôturée',2,NULL,'2025-08-06 10:32:33');
+INSERT INTO request_history VALUES(5,1,'clôturée',2,NULL,'2025-08-06 10:32:43');
+INSERT INTO request_history VALUES(6,2,'validé',2,'','2025-08-06 10:35:20');
+INSERT INTO request_history VALUES(7,4,'soumis',2,NULL,'2025-08-06 10:38:20');
+INSERT INTO request_history VALUES(8,4,'validé',2,'','2025-08-06 10:38:42');
+INSERT INTO request_history VALUES(9,4,'clôturée',2,NULL,'2025-08-06 10:38:49');
+INSERT INTO request_history VALUES(10,5,'soumis',3,NULL,'2025-08-06 11:19:32');
+INSERT INTO request_history VALUES(11,5,'validé',3,'','2025-08-06 11:20:43');
+INSERT INTO request_history VALUES(12,5,'clôturée',2,NULL,'2025-08-06 11:21:15');
+INSERT INTO request_history VALUES(13,6,'soumis',2,NULL,'2025-08-06 11:42:53');
+INSERT INTO request_history VALUES(14,6,'validé',2,'','2025-08-06 11:43:11');
+INSERT INTO request_history VALUES(15,6,'clôturée',2,NULL,'2025-08-06 11:43:20');
+INSERT INTO request_history VALUES(16,7,'soumis',2,NULL,'2025-08-06 12:15:28');
+INSERT INTO request_history VALUES(17,7,'validé',2,'','2025-08-06 12:15:58');
+INSERT INTO request_history VALUES(18,7,'clôturée',2,NULL,'2025-08-06 12:16:03');
+INSERT INTO request_history VALUES(19,8,'soumis',2,NULL,'2025-08-07 08:28:48');
 DELETE FROM sqlite_sequence;
 INSERT INTO sqlite_sequence VALUES('poles',5);
 INSERT INTO sqlite_sequence VALUES('departments',5);
 INSERT INTO sqlite_sequence VALUES('users',5);
-INSERT INTO sqlite_sequence VALUES('collaborator_types',1);
-INSERT INTO sqlite_sequence VALUES('requests',3);
+INSERT INTO sqlite_sequence VALUES('collaborator_types',2);
+INSERT INTO sqlite_sequence VALUES('requests',8);
 INSERT INTO sqlite_sequence VALUES('network_accesses',3);
-INSERT INTO sqlite_sequence VALUES('request_history',3);
+INSERT INTO sqlite_sequence VALUES('request_history',19);
 COMMIT;

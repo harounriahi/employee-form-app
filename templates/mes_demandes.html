@@ -3,47 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <title>Demandes d'accès</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <style>
         body {
-            background: #f7f9fa;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #e0e6ed 0%, #dce9e6 100%);
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        .biat-glass-header {
+            background: rgba(42, 90, 78, 0.93);
+            border-radius: 28px;
+            box-shadow: 0 10px 32px rgba(44, 62, 80, 0.19);
+            padding: 32px 36px 18px 36px;
+            margin: 36px auto 30px auto;
+            max-width: 1050px;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+        .biat-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .biat-header-title {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1.7px;
+            text-shadow: 0 2px 6px rgba(44,62,80,0.13);
+        }
+        .biat-logo {
+            height: 54px;
+            filter: drop-shadow(0 2px 8px #0a371a33);
+        }
+        .biat-header-user {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #e9fbe9;
+        }
+        .user-email {
+            background: rgba(255,255,255,0.14);
+            padding: 7px 18px;
+            border-radius: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(44,62,80,0.07);
+            color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #ff7c7c 0%, #f06292 100%);
+            color: #fff !important;
+            border-radius: 12px;
+            padding: 8px 24px;
+            font-size: 1.08rem;
+            border: none;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.11);
+            transition: background 0.18s, color 0.18s, transform 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c62828 0%, #ad1457 100%);
+            color: #fff !important;
+            transform: translateY(-2px) scale(1.04);
+        }
+        .biat-nav {
+            display: flex;
+            gap: 20px;
+            margin-top: 18px;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+        .biat-nav-btn {
+            background: linear-gradient(90deg, #388e3c 0%, #8bc34a 100%);
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 14px;
+            padding: 12px 28px;
+            text-decoration: none;
+            box-shadow: 0 2px 13px rgba(44,62,80,0.12);
+            letter-spacing: 0.7px;
+            transition: background 0.22s, color 0.22s, transform 0.19s;
+            border: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            position: relative;
+        }
+        .biat-nav-btn.active,
+        .biat-nav-btn:focus,
+        .biat-nav-btn:hover {
+            background: linear-gradient(90deg, #256029 0%, #43a047 100%);
+            color: #fff;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 20px rgba(44,62,80,0.18);
+            text-decoration: none;
         }
         .container {
             max-width: 1050px;
-            margin: 40px auto 0 auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
-            padding: 34px 38px 30px 38px;
+            margin: 24px auto 0 auto;
+            background: rgba(255,255,255,0.98);
+            border-radius: 22px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.09);
+            padding: 38px 38px 30px 38px;
         }
         h2 {
             color: #195a4c;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
+            font-size: 2.1rem;
         }
         .role-links {
             margin-bottom: 24px;
+            font-size: 1.12rem;
+            font-weight: 500;
+            color: #256029;
+            letter-spacing: 0.2px;
         }
         .role-links a {
-            color: #195a4c;
+            color: #256029;
             margin-right: 22px;
             text-decoration: none;
-            font-weight: 500;
-            letter-spacing: 0.1px;
+            background: #eafbe5;
+            padding: 7px 16px;
+            border-radius: 9px;
+            transition: background 0.18s, color 0.18s;
         }
         .role-links a:hover {
-            text-decoration: underline;
+            background: #388e3c;
+            color: #fff;
+            text-decoration: none;
         }
         table {
             border-collapse: collapse;
             width: 100%;
             background: #f9f9fb;
             font-size: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 7px #eafbe5;
         }
         th, td {
-            padding: 13px 10px;
+            padding: 14px 10px;
             text-align: left;
             border-bottom: 1px solid #e0ece8;
         }
@@ -52,18 +169,21 @@
             color: #195a4c;
             font-weight: 600;
             font-size: 16px;
+            letter-spacing: 0.4px;
         }
         tr:hover {
             background: #f3faf7;
+            transition: background 0.15s;
         }
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             border-radius: 16px;
-            padding: 3px 12px;
+            padding: 4px 14px;
             font-size: 15px;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
         .status-soumis {
             background: #fff2e0;
@@ -85,59 +205,79 @@
             background: #e0e0e0;
             color: #7c7c7c;
         }
-        .action-btn, .cloture-btn {
-            background: #195a4c;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 14px;
-            cursor: pointer;
-            margin-right: 6px;
-            font-size: 14px;
-            transition: background 0.15s;
-        }
-        .action-btn.reject {
-            background: #e74c3c;
-        }
-        .cloture-btn {
-            background: #888;
-        }
-        .action-btn:disabled, .cloture-btn:disabled {
-            opacity: 0.48;
-            cursor: not-allowed;
-        }
         .view-btn {
-            background: #2980b9;
+            background: linear-gradient(90deg, #2980b9 0%, #4fc3f7 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 6px 14px;
+            border-radius: 8px;
+            padding: 7px 16px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            box-shadow: 0 2px 8px #1761a022;
+            transition: background 0.17s, color 0.17s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
         }
         .view-btn:hover {
-            background: #1761a0;
+            background: linear-gradient(90deg, #1761a0 0%, #2980b9 100%);
+            color: #fff;
+            text-decoration: none;
+        }
+        details summary {
+            cursor:pointer; 
+            color:#195a4c; 
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+            padding: 2px 0;
+        }
+        details ul {
+            margin:0; padding-left:15px; font-size:13px;
         }
         @media (max-width: 700px) {
             .container { padding: 12px 3vw; }
             th, td { font-size: 13px; padding: 9px 3px; }
             h2 { font-size: 20px; }
             .role-links { font-size: 13px; }
+            .biat-glass-header {padding: 10px;}
         }
     </style>
 </head>
 <body>
+    <div class="biat-glass-header">
+        <div class="biat-header-top">
+            <div class="biat-header-title">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BIAT" class="biat-logo" />
+                <span>LISTE DES DEMANDES D'ACCÈS</span>
+            </div>
+            <div class="biat-header-user">
+                <span class="user-email"><i class="fas fa-user-circle"></i> {{ session.get('user') or 'Invité' }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </a>
+            </div>
+        </div>
+        <nav class="biat-nav">
+            <a href="{{ url_for('dashboard') }}" class="biat-nav-btn"><i class="fas fa-home"></i> Accueil</a>
+            <a href="{{ url_for('form') }}" class="biat-nav-btn"><i class="fas fa-edit"></i> Formulaire</a>
+            <a href="{{ url_for('mes_demandes') }}" class="biat-nav-btn"><i class="fas fa-list-alt"></i> Mes demandes</a>
+            {% if session['role'] == 'informatique' %}
+                <a href="{{ url_for('register') }}" class="biat-nav-btn"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+            {% endif %}
+        </nav>
+    </div>
     <div class="container">
         <h2>Les demandes d'accès</h2>
         <div class="role-links">
-            <a href="{{ url_for('form') }}">Faire une demande</a>
+            <a href="{{ url_for('form') }}"><i class="fas fa-plus-circle"></i> Faire une demande</a>
             {% if session['role'] in ['responsable', 'validateur', 'informatique'] %}
-                | <a href="{{ url_for('mes_demandes') }}">Voir mes demandes</a>
+                <a href="{{ url_for('mes_demandes') }}"><i class="fas fa-list-alt"></i> Voir mes demandes</a>
             {% endif %}
             {% if session['role'] == 'informatique' %}
-                | <a href="{{ url_for('register') }}">Ajouter un utilisateur</a>
+                <a href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
             {% endif %}
         </div>
 
@@ -165,17 +305,17 @@
                         <td>
                             {# Status mapping and badge #}
                             {% if status == 'soumis' %}
-                                <span class="status-badge status-soumis" title="En attente de validation &#x23F3;">&#x23F3; Soumis</span>
+                                <span class="status-badge status-soumis" title="En attente de validation &#x23F3;"><i class="fas fa-paper-plane"></i> Soumis</span>
                             {% elif status == 'en traitement' %}
-                                <span class="status-badge status-traitement" title="En cours de traitement">&#9889; En traitement</span>
+                                <span class="status-badge status-traitement" title="En cours de traitement"><i class="fas fa-spinner"></i> En traitement</span>
                             {% elif status == 'traité' %}
-                                <span class="status-badge status-traite" title="Demande traitée">&#10003; Traité</span>
+                                <span class="status-badge status-traite" title="Demande traitée"><i class="fas fa-check-double"></i> Traité</span>
                             {% elif status == 'validé' %}
-                                <span class="status-badge status-traite" title="Demande validée">&#10003; Validée</span>
+                                <span class="status-badge status-traite" title="Demande validée"><i class="fas fa-check-circle"></i> Validée</span>
                             {% elif status == 'rejeté' %}
-                                <span class="status-badge status-rejete" title="Demande rejetée">&#10060; Rejeté</span>
+                                <span class="status-badge status-rejete" title="Demande rejetée"><i class="fas fa-times-circle"></i> Rejeté</span>
                             {% elif status in ['cloture', 'cloturée', 'clôturée'] %}
-                                <span class="status-badge status-cloture" title="Demande clôturée">&#128274; Clôturé</span>
+                                <span class="status-badge status-cloture" title="Demande clôturée"><i class="fas fa-lock"></i> Clôturé</span>
                             {% else %}
                                 <span class="status-badge">{{ status|capitalize }}</span>
                             {% endif %}
@@ -189,8 +329,8 @@
                         </td>
                         <td>
                             <details>
-                                <summary style="cursor:pointer; color:#195a4c;">Voir</summary>
-                                <ul style="margin:0; padding-left:15px; font-size:13px;">
+                                <summary>Voir</summary>
+                                <ul>
                                 {% for h in dwh.history %}
                                     <li>
                                         <b>{{ h.action|capitalize }}</b>
@@ -203,7 +343,7 @@
                             </details>
                         </td>
                         <td>
-                            <a href="{{ url_for('view_demande', request_id=d[0]) }}" class="view-btn">Voir</a>
+                            <a href="{{ url_for('view_demande', request_id=d[0]) }}" class="view-btn"><i class="fas fa-eye"></i> Voir</a>
                         </td>
                     </tr>
                     {% endfor %}

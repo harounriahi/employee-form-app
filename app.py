@@ -656,14 +656,23 @@ def mes_demandes():
         
         user_id, nom, prenom = user
 
-        # Récupérer les demandes liées à l'utilisateur avec status et rejection_comment
-        cursor.execute("""
-            SELECT r.id, r.objet_demande, r.date_demande, ct.name, r.date_debut_stage, r.date_fin_stage, r.acces_partages, r.status, r.rejection_comment
-            FROM requests r
-            LEFT JOIN collaborator_types ct ON r.collaborator_type_id = ct.id
-            WHERE r.user_id = ?
-            ORDER BY r.date_demande DESC
-        """, (user_id,))
+        # Montrer toutes les demandes pour validateur/informatique, sinon seulement celles de l'utilisateur
+        role = session.get('role')
+        if role in ['validateur', 'informatique']:
+            cursor.execute("""
+                SELECT r.id, r.objet_demande, r.date_demande, ct.name, r.date_debut_stage, r.date_fin_stage, r.acces_partages, r.status, r.rejection_comment
+                FROM requests r
+                LEFT JOIN collaborator_types ct ON r.collaborator_type_id = ct.id
+                ORDER BY r.date_demande DESC
+            """)
+        else:
+            cursor.execute("""
+                SELECT r.id, r.objet_demande, r.date_demande, ct.name, r.date_debut_stage, r.date_fin_stage, r.acces_partages, r.status, r.rejection_comment
+                FROM requests r
+                LEFT JOIN collaborator_types ct ON r.collaborator_type_id = ct.id
+                WHERE r.user_id = ?
+                ORDER BY r.date_demande DESC
+            """, (user_id,))
         demandes = cursor.fetchall()
 
         # Récupérer l'historique pour chaque demande

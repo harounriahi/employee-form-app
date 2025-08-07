@@ -4,86 +4,152 @@
   <meta charset="UTF-8" />
   <title>ASSURANCES BIAT - Consultation Demande d'accès</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/biat-form.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
   <style>
     body {
-      background: #f3f6f1;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: linear-gradient(120deg, #e0e6ed 0%, #dce9e6 100%);
+      min-height: 100vh;
     }
-    .biat-container {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.13);
-      margin: 40px auto;
-      padding: 40px 36px 36px 36px;
-      max-width: 900px;
+    .biat-glass-header {
+      background: rgba(42, 90, 78, 0.93);
+      border-radius: 28px;
+      box-shadow: 0 10px 32px rgba(44, 62, 80, 0.19);
+      padding: 36px 36px 22px 36px;
+      margin: 38px auto 32px auto;
+      max-width: 1050px;
+      backdrop-filter: blur(8px);
+      position: relative;
     }
-    .biat-header {
+    .biat-header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 3px solid #e6ecf5;
-      padding-bottom: 20px;
-      margin-bottom: 32px;
-      background: #fff;
     }
-    .biat-logo {
-      height: 60px;
-    }
-    /* Main insurance color: dark green */
-    .biat-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #256029;
-      letter-spacing: 1.5px;
-      margin: 0;
-    }
-    .biat-header-right {
+    .biat-header-title {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1.8px;
+      text-shadow: 0 2px 6px rgba(44,62,80,0.11);
+    }
+    .biat-logo {
+      height: 58px;
+      filter: drop-shadow(0 2px 8px #0a371a33);
+    }
+    .biat-header-user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
       font-size: 1.08rem;
-      color: #256029;
+      font-weight: 500;
+      color: #e9fbe9;
+    }
+    .user-email {
+      background: rgba(255,255,255,0.13);
+      padding: 7px 19px;
+      border-radius: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(44,62,80,0.06);
+      color: #f1f1f1;
+      display: flex;
+      align-items: center;
+      gap: 7px;
     }
     .logout-btn {
+      background: linear-gradient(135deg, #ff7c7c 0%, #f06292 100%);
       color: #fff !important;
-      background: #256029;
-      border-radius: 7px;
-      padding: 5px 18px;
-      font-size: 1rem;
-      text-decoration: none !important;
+      border-radius: 12px;
+      padding: 8px 24px;
+      font-size: 1.08rem;
       border: none;
-      transition: background 0.2s;
-      font-weight: bold;
-      box-shadow: 0 2px 6px rgba(44,62,80,0.09);
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(44,62,80,0.11);
+      transition: background 0.18s, color 0.18s, transform 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .logout-btn:hover {
-      background: #388e3c;
+      background: linear-gradient(135deg, #c62828 0%, #ad1457 100%);
       color: #fff !important;
+      transform: translateY(-2px) scale(1.04);
+    }
+    .biat-nav {
+      display: flex;
+      gap: 20px;
+      margin-top: 28px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .biat-nav-btn {
+      background: linear-gradient(90deg, #388e3c 0%, #8bc34a 100%);
+      color: #fff;
+      font-size: 1.17rem;
+      font-weight: 600;
+      border-radius: 14px;
+      padding: 16px 34px;
+      text-decoration: none;
+      box-shadow: 0 2px 13px rgba(44,62,80,0.12);
+      letter-spacing: 0.8px;
+      transition: background 0.22s, color 0.22s, transform 0.19s;
+      border: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      position: relative;
+    }
+    .biat-nav-btn.active,
+    .biat-nav-btn:focus,
+    .biat-nav-btn:hover {
+      background: linear-gradient(90deg, #256029 0%, #43a047 100%);
+      color: #fff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 20px rgba(44,62,80,0.18);
+      text-decoration: none;
+    }
+    .biat-container {
+      background: rgba(255,255,255,0.98);
+      border-radius: 30px;
+      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.10);
+      margin: 0 auto 48px auto;
+      padding: 40px 36px 36px 36px;
+      max-width: 900px;
     }
     .biat-form-section {
-      background: #f5faff;
-      border-radius: 12px;
+      background: linear-gradient(100deg, #f5faff 60%, #eafbe5 100%);
+      border-radius: 18px;
       box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-      padding: 24px 22px 18px 22px;
-      margin-bottom: 26px;
-      border-left: 5px solid #256029;
+      padding: 28px 22px 22px 22px;
+      margin-bottom: 36px;
+      border-left: 6px solid #256029;
     }
     .biat-section-title {
-      font-size: 1.23rem;
+      font-size: 1.33rem;
       font-weight: 700;
       color: #256029;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       letter-spacing: 0.7px;
+      text-shadow: 0 1px 4px #eafbe5;
     }
     .biat-form-group {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     .biat-label {
       font-weight: 500;
       color: #256029;
       margin-bottom: 8px;
       display: block;
+      font-size: 1.08rem;
+      letter-spacing: 0.2px;
     }
     .biat-required::after {
       content: "*";
@@ -95,13 +161,15 @@
       background-color: #e5efe5 !important;
       border: 1.5px solid #b6d3ec;
       color: #256029 !important;
-      border-radius: 8px;
-      padding: 10px 15px;
+      border-radius: 10px;
+      padding: 13px 15px;
       width: 100%;
-      font-size: 1.04rem;
-      margin-bottom: 5px;
+      font-size: 1.09rem;
+      margin-bottom: 7px;
       font-weight: 500;
       letter-spacing: 0.5px;
+      box-shadow: 0 1px 4px #dbe9e5;
+      transition: border-color 0.18s;
     }
     .biat-radio-group, .biat-checkbox-group {
       display: flex;
@@ -109,35 +177,46 @@
       flex-wrap: wrap;
     }
     .biat-radio, .biat-checkbox {
-      font-weight: 400;
+      font-weight: 500;
       color: #256029;
+      position: relative;
+      font-size: 1.08rem;
+      border-radius: 7px;
+      padding: 7px 14px 7px 28px;
+      background: #f3f6f1;
+      margin-bottom: 2px;
+      box-shadow: 0px 1px 5px #eafbe5;
+      cursor: pointer;
+      transition: background 0.16s;
     }
     .biat-system-card {
       background: #e8f3ea;
-      border-radius: 9px;
-      padding: 12px 20px 10px 20px;
-      margin-bottom: 10px;
-      box-shadow: 0 1px 6px rgba(44,62,80,0.06);
+      border-radius: 12px;
+      padding: 16px 22px 13px 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 7px rgba(44,62,80,0.06);
       border: 1.5px solid #a3bfa8;
     }
     .biat-system-header {
-      font-weight: 500;
+      font-weight: 600;
       color: #256029;
-      margin-bottom: 8px;
-      font-size: 1.09rem;
-    }
-    .mt-4 {
-      margin-top: 2.2rem !important;
+      margin-bottom: 12px;
+      font-size: 1.13rem;
+      letter-spacing: 0.4px;
     }
     .status-box {
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 12px;
-      margin-top: 12px;
-      font-size: 1.13rem;
+      margin-bottom: 18px;
+      margin-top: 18px;
+      font-size: 1.18rem;
       font-weight: 600;
       color: #256029;
+      background: #eafbe5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 8px #dbe9e5;
     }
     .badge {
       font-size: 1.08rem;
@@ -146,6 +225,7 @@
       font-weight: 700;
       box-shadow: 0 2px 8px rgba(44,62,80,0.04);
       border: none;
+      letter-spacing: 0.6px;
     }
     .bg-success {
       background: linear-gradient(90deg, #2e7d32 0%, #43a047 100%) !important;
@@ -176,16 +256,19 @@
       color: #256029 !important;
     }
     .btn {
-      padding: 11px 30px;
-      font-size: 1.16rem;
+      padding: 14px 32px;
+      font-size: 1.18rem;
       margin-right: 16px;
       margin-bottom: 7px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 700;
       letter-spacing: 0.6px;
       box-shadow: 0 2px 9px rgba(44,62,80,0.07);
       border: none;
       transition: background 0.18s, color 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .btn-success {
       background: linear-gradient(90deg, #256029 0%, #43a047 100%);
@@ -203,14 +286,6 @@
       background: linear-gradient(90deg, #8f98a8 0%, #b2bacd 100%);
       color: #fff;
     }
-    .btn-danger {
-      background: linear-gradient(90deg, #e74c3c 0%, #ff7675 100%);
-      color: #fff;
-    }
-    .btn-danger:hover {
-      background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
-      color: #fff;
-    }
     .btn-primary {
       background: linear-gradient(90deg, #256029 0%, #388e3c 100%);
       color: #fff;
@@ -220,40 +295,60 @@
       color: #fff;
     }
     .alert-warning {
-      font-size: 1.03rem;
+      font-size: 1.08rem;
       margin-top: 10px;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
       background: linear-gradient(90deg, #fffbe6 0%, #fff6d6 100%);
       color: #995700;
       border: 1.5px solid #ffe082;
       font-weight: 500;
     }
+    .mt-4 {
+      margin-top: 2.7rem !important;
+    }
     @media (max-width: 900px) {
-      .biat-container {max-width: 100%;padding: 16px;}
+      .biat-glass-header {max-width: 100%;padding: 20px;}
+      .biat-header-title {font-size: 1.3rem;}
+      .biat-nav-btn {font-size: 1rem; padding: 10px 16px;}
+      .biat-nav {gap: 10px;}
+      .biat-header-user {font-size: 1rem;}
+      .user-email {padding: 6px 9px;}
+      .biat-container {padding: 18px;}
     }
     @media (max-width: 600px) {
-      .biat-header, .biat-header-center, .biat-header-right {flex-direction: column;gap:12px;}
-      .biat-form-section {padding: 11px 7px;}
-      .btn {padding: 10px 12px;}
+      .biat-header-top {flex-direction: column;gap:8px;}
+      .biat-header-title {font-size: 1.02rem;gap:7px;}
+      .biat-nav {flex-direction: column;gap:11px;}
+      .biat-nav-btn {padding: 10px 10px;}
+      .user-email {font-size: 0.95rem;}
+      .status-box {font-size: 1rem;}
+      .biat-container {padding: 10px;}
     }
   </style>
 </head>
 <body>
-  <div class="biat-container">
-    <div class="biat-header">
-      <div class="biat-header-left">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Assurances BIAT" class="biat-logo" />
+  <div class="biat-glass-header">
+    <div class="biat-header-top">
+      <div class="biat-header-title">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BIAT" class="biat-logo" />
+        <span>CONSULTATION DEMANDE D'ACCÈS SYSTÈME</span>
       </div>
-      <div class="biat-header-center">
-        <h1 class="biat-title">CONSULTATION DEMANDE D'ACCÈS SYSTÈME</h1>
-      </div>
-      <div class="biat-header-right">
-        <span>{{ session.get('user') or 'Invité' }}</span>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a>
+      <div class="biat-header-user">
+        <span class="user-email"><i class="fas fa-user-circle"></i> {{ session.get('user') or 'Invité' }}</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
       </div>
     </div>
+    <nav class="biat-nav">
+      <a href="{{ url_for('dashboard') }}" class="biat-nav-btn"><i class="fas fa-home"></i> Accueil</a>
+      <a href="{{ url_for('form') }}" class="biat-nav-btn"><i class="fas fa-edit"></i> Formulaire</a>
+      <a href="{{ url_for('mes_demandes') }}" class="biat-nav-btn"><i class="fas fa-list-alt"></i> Mes demandes</a>
+    </nav>
+  </div>
 
+  <div class="biat-container">
     <form>
       <fieldset disabled>
         <!-- Section Informations de base -->
@@ -404,22 +499,22 @@
     <div class="status-box">
       <strong>Statut de la demande :</strong>
       {% if demande.status == 'validé' %}
-        <span class="badge bg-success">Validée</span>
+        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Validée</span>
       {% elif demande.status == 'cloturée' %}
-        <span class="badge bg-secondary">Clôturée</span>
+        <span class="badge bg-secondary"><i class="fas fa-archive"></i> Clôturée</span>
       {% elif demande.status == 'rejeté' %}
-        <span class="badge bg-danger">Rejetée</span>
+        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Rejetée</span>
         {% if demande.rejection_comment %}
           <div class="alert alert-warning mt-2">
             Raison du rejet : {{ demande.rejection_comment }}
           </div>
         {% endif %}
       {% elif demande.status == 'soumis' %}
-        <span class="badge bg-warning text-dark">Soumise</span>
+        <span class="badge bg-warning text-dark"><i class="fas fa-paper-plane"></i> Soumise</span>
       {% elif demande.status == 'traité' %}
-        <span class="badge bg-info text-dark">Traitée</span>
+        <span class="badge bg-info text-dark"><i class="fas fa-check-double"></i> Traitée</span>
       {% elif demande.status == 'en traitement' %}
-        <span class="badge bg-primary">En traitement</span>
+        <span class="badge bg-primary"><i class="fas fa-spinner"></i> En traitement</span>
       {% else %}
         <span class="badge bg-light text-dark">{{ demande.status }}</span>
       {% endif %}
@@ -427,24 +522,22 @@
 
     <!-- Boutons d'action selon le rôle -->
     <div class="mt-4" style="display: flex; gap: 18px;">
-      {% if session.get('role') == 'validateur' %}
+      {% if session.get('role') in ['responsable', 'validateur', 'informatique'] %}
         <form method="POST" action="{{ url_for('validate_request', request_id=demande.id) }}">
-          <button type="submit" name="action" value="valider" class="btn btn-success">Valider</button>
+          <button type="submit" name="action" value="valider" class="btn btn-success"><i class="fas fa-check-circle"></i> Valider</button>
         </form>
-      {% elif session.get('role') == 'informatique' %}
-        <form method="POST" action="{{ url_for('validate_request', request_id=demande.id) }}">
-          <button type="submit" name="action" value="valider" class="btn btn-success">Valider</button>
-        </form>
+      {% endif %}
+      {% if session.get('role') == 'informatique' %}
         <form method="POST" action="{{ url_for('cloturer_request', request_id=demande.id) }}">
-          <button type="submit" class="btn btn-secondary">Clôturer</button>
+          <button type="submit" class="btn btn-secondary"><i class="fas fa-archive"></i> Clôturer</button>
         </form>
       {% endif %}
     </div>
+    <div style="margin-top: 32px;">
+      <a href="{{ url_for('mes_demandes') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Retour à mes demandes
+      </a>
+    </div>
   </div>
-  <div style="margin-top: 30px;">
-    <a href="{{ url_for('mes_demandes') }}" class="btn btn-primary">
-        &#8592; Retour à mes demandes
-    </a>
-</div>
 </body>
 </html>

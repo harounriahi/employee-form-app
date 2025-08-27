@@ -13,7 +13,6 @@
       background: linear-gradient(120deg, #e0e6ed 0%, #dce9e6 100%);
       min-height: 100vh;
     }
-    /* Header override to match form style and screenshot */
     .biat-glass-header {
       border-radius:32px;
       border-bottom:none;
@@ -90,40 +89,6 @@
       color: #fff !important;
       transform: translateY(-2px) scale(1.04);
     }
-    .biat-nav {
-      margin-top:38px;
-      justify-content:center;
-      gap:36px;
-      display:flex;
-      flex-wrap:wrap;
-    }
-    .biat-nav-btn {
-      background:linear-gradient(90deg,#5bb84c 0%,#a5e569 100%);
-      color:#fff;
-      font-size:1.25rem;
-      font-weight:700;
-      border-radius:18px;
-      padding:22px 54px;
-      text-decoration:none;
-      box-shadow:0 2px 13px rgba(44,62,80,0.11);
-      letter-spacing:1.1px;
-      display:flex;
-      align-items:center;
-      gap:15px;
-      transition:background 0.22s, color 0.22s, transform 0.19s;
-      border:none;
-      outline:none;
-    }
-    .biat-nav-btn.active,
-    .biat-nav-btn:focus,
-    .biat-nav-btn:hover {
-      background: linear-gradient(90deg, #256029 0%, #43a047 100%);
-      color: #fff;
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 4px 20px rgba(44,62,80,0.18);
-      text-decoration: none;
-    }
-    /* Keep rest of styles untouched for sections, inputs etc. */
     .biat-container {
       background: rgba(255,255,255,0.98);
       border-radius: 30px;
@@ -132,7 +97,6 @@
       padding: 40px 36px 36px 36px;
       max-width: 900px;
     }
-    /* ... keep all your previous styles for sections ... */
     .biat-form-section {
       background: linear-gradient(100deg, #f5faff 60%, #eafbe5 100%);
       border-radius: 18px;
@@ -303,6 +267,14 @@
       background: linear-gradient(90deg, #388e3c 0%, #256029 100%);
       color: #fff;
     }
+    .btn-info {
+      background: linear-gradient(90deg, #81ecec 0%, #43a047 100%);
+      color: #256029;
+    }
+    .btn-info:hover {
+      background: linear-gradient(90deg, #43a047 0%, #81ecec 100%);
+      color: #fff;
+    }
     .alert-warning {
       font-size: 1.08rem;
       margin-top: 10px;
@@ -337,43 +309,22 @@
   </style>
 </head>
 <body>
-  <div class="biat-glass-header">
-    <div class="biat-header-top">
-      <div class="biat-header-title">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BIAT" class="biat-logo" />
-        <span>
-          CONSULTATION<br />
-          DEMANDE<br />
-          D'ACCÈS<br />
-          SYSTÈME
-        </span>
-      </div>
-      <div class="biat-header-user">
-        <span class="user-email">
-          <i class="fas fa-user-circle"></i> {{ session.get('user') or 'Invité' }}
-        </span>
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a>
-      </div>
+    <div class="biat-glass-header">
+        <div class="biat-header-top">
+          <div class="biat-header-title">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BIAT" class="biat-logo">
+          </div>
+          <div class="biat-header-user">
+            <span class="user-email"><i class="fas fa-user-circle"></i> {{ session.get('user') or 'Invité' }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+          </div>
+        </div>
+        <div style="width:100%; display:flex; justify-content:center; align-items:center; margin-top:28px;">
+          <span style="font-size:2.3rem; font-weight:900; letter-spacing:1.5px; color:#fff; line-height:1.08; text-align:center; text-shadow:0 2px 6px rgba(44,62,80,0.09);">
+            CONSULTATION DEMANDE D'ACCÈS SYSTÈME
+          </span>
+        </div>
     </div>
-    <nav class="biat-nav">
-      <a href="{{ url_for('dashboard') }}" class="biat-nav-btn">
-        <i class="fas fa-home"></i> Accueil
-      </a>
-      <a href="{{ url_for('form') }}" class="biat-nav-btn">
-        <i class="fas fa-edit"></i> Formulaire
-      </a>
-      <a href="{{ url_for('mes_demandes') }}" class="biat-nav-btn">
-        <i class="fas fa-list-alt"></i> Mes demandes
-      </a>
-      {% if session.get('role') == 'informatique' %}
-        <a href="{{ url_for('register') }}" class="biat-nav-btn">
-          <i class="fas fa-user-plus"></i> Ajouter un utilisateur
-        </a>
-      {% endif %}
-    </nav>
-  </div>
 
   <div class="biat-container">
     <form>
@@ -400,13 +351,19 @@
             <input type="text" class="biat-input" value="{{ demande.demandeur }}">
           </div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="biat-form-group">
                 <label class="biat-label biat-required">Département</label>
                 <input type="text" name="departement" class="biat-input" value="{{ demande.departement }}">
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="biat-form-group">
+                <label class="biat-label biat-required">Produit</label>
+                <input type="text" name="produit" class="biat-input" value="{{ demande.produit }}">
+              </div>
+            </div>
+            <div class="col-md-4">
               <div class="biat-form-group">
                 <label class="biat-label biat-required">Pôle</label>
                 <input type="text" name="pole" class="biat-input" value="{{ demande.pole }}">
@@ -461,45 +418,34 @@
           </div>
         </div>
 
-        <!-- Section Branches -->
-        <div class="biat-form-section">
-          <h3 class="biat-section-title">Branches concernées</h3>
-          <div class="biat-checkbox-group">
-            {% for b in all_branches %}
-              <label class="biat-checkbox">
-                <input type="checkbox" {% if b in demande.branches %}checked{% endif %} disabled>
-                {{ b }}
-              </label>
-            {% endfor %}
-          </div>
-        </div>
-
         <!-- Section Systèmes d'information -->
         <div class="biat-form-section">
           <h3 class="biat-section-title">Systèmes d'information</h3>
           <div id="sousType">
-            {% for branche, profiles in demande.profils_env.items() %}
-              <div class="biat-system-card mb-3">
-                <div class="biat-system-header">
-                  <strong>{{ branche }}</strong>
-                </div>
-                {% for profile, envs in profiles.items() %}
-                  <div class="d-flex align-items-center justify-content-between mb-2">
-                    <label class="me-3">{{ profile }}</label>
+            {% if demande.systemes %}
+                {% for sys in demande.systemes %}
+                <div class="biat-system-card mb-3">
+                <div class="biat-system-header"><strong>{{ sys.system }}</strong></div>
+                {% for profile in sys.profils %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                    <label class="me-3">{{ profile.nom }}</label>
                     <div class="d-flex gap-3">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" {% if 'TEST' in envs %}checked{% endif %} disabled>
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" {% if 'TEST' in profile.envs %}checked{% endif %} disabled>
                         <label class="form-check-label">TEST</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" {% if 'PROD' in envs %}checked{% endif %} disabled>
+                        </div>
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" {% if 'PROD' in profile.envs %}checked{% endif %} disabled>
                         <label class="form-check-label">PROD</label>
-                      </div>
+                        </div>
                     </div>
-                  </div>
+                    </div>
                 {% endfor %}
-              </div>
+                </div>
             {% endfor %}
+            {% else %}
+            <p>Aucun système sélectionné.</p>
+            {% endif %}
           </div>
         </div>
 
@@ -532,9 +478,7 @@
       {% elif demande.status == 'rejeté' %}
         <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Rejetée</span>
         {% if demande.rejection_comment %}
-          <div class="alert alert-warning mt-2">
-            Raison du rejet : {{ demande.rejection_comment }}
-          </div>
+          <div class="alert alert-warning mt-2">Raison du rejet : {{ demande.rejection_comment }}</div>
         {% endif %}
       {% elif demande.status == 'soumis' %}
         <span class="badge bg-warning text-dark"><i class="fas fa-paper-plane"></i> Soumise</span>
@@ -557,6 +501,9 @@
       {% if session.get('role') == 'informatique' %}
         <form method="POST" action="{{ url_for('cloturer_request', request_id=demande.id) }}">
           <button type="submit" class="btn btn-secondary"><i class="fas fa-archive"></i> Clôturer</button>
+        </form>
+        <form method="POST" action="{{ url_for('traite_request', request_id=demande.id) }}">
+          <button type="submit" class="btn btn-info"><i class="fas fa-check-double"></i> Traiter</button>
         </form>
       {% endif %}
     </div>

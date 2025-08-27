@@ -222,22 +222,53 @@
           />
         </div>
         <div class="row">
-          <div class="col-md-6">
+          <!-- Département -->
+          <div class="col-md-4">
             <div class="biat-form-group">
               <label class="biat-label biat-required">Département</label>
-              <input type="text" name="departement" class="biat-input" placeholder="Ex: Systèmes d'information" />
+              <select id="departement" name="departement" class="biat-input" onchange="updatePole()">
+                <option value="">-- Sélectionner un département --</option>
+                <option value="Vie">Vie</option>
+                <option value="Santé">Santé</option>
+                <option value="Non-Vie">Non-Vie</option>
+                <option value="Réseaux et Animation Commerciale">Réseaux et Animation Commerciale</option>
+                <option value="Bancassurance">Bancassurance</option>
+                <option value="Division Marketing Communication et Parcours Clients">Division Marketing Communication et Parcours Clients</option>
+                <option value="Comptabilité">Comptabilité</option>
+                <option value="Recouvrement">Recouvrement</option>
+                <option value="Budget et Contrôle de gestion">Budget et Contrôle de gestion</option>
+                <option value="SI">SI</option>
+                <option value="MOA et Organisation">MOA et Organisation</option>
+                <option value="RH et Moyens Généraux">RH et Moyens Généraux</option>
+                <option value="Juridique et CTX">Juridique et CTX</option>
+                <option value="Financier">Financier</option>
+              </select>
             </div>
           </div>
-          <div class="col-md-6">
+        
+          <!-- Produit -->
+          <div class="col-md-4">
+            <div class="biat-form-group">
+              <label class="biat-label biat-required">Produit</label>
+              <select id="produit" name="produit" class="biat-input">
+                <option value="">-- Sélectionner un produit --</option>
+              </select>
+            </div>
+          </div>
+        
+          <!-- Pôle -->
+          <div class="col-md-4">
             <div class="biat-form-group">
               <label class="biat-label biat-required">Pôle</label>
-              <input type="text" name="pole" class="biat-input" placeholder="Ex: Back Office" />
+              <input type="text" id="pole" name="pole" class="biat-input" readonly placeholder="Automatique..." />
             </div>
           </div>
         </div>
-      </div>
+        
+        
+        
 
-      <!-- Section Utilisateur -->
+      <!-- Section Utilisateur -->  
       <div class="biat-form-section">
         <h3 class="biat-section-title">Informations utilisateur</h3>
         <div class="biat-form-group">
@@ -287,48 +318,7 @@
         </div>
       </div>
 
-      <!-- Section Branches -->
-      <div class="biat-form-section">
-        <h3 class="biat-section-title">Branches concernées</h3>
-        <div class="biat-checkbox-group">
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="AUTO" />
-            AUTO
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="IARDS" />
-            IARDS
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Transport" />
-            Transport
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Santé" />
-            Santé
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Epargne" />
-            Epargne
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Prévoyance" />
-            Prévoyance
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Comptabilité" />
-            Comptabilité
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="Recouvrement" />
-            Recouvrement
-          </label>
-          <label class="biat-checkbox">
-            <input type="checkbox" name="branches[]" value="RH" />
-            RH
-          </label>
-        </div>
-      </div>
+      
 
       <!-- Section Systèmes -->
       <div class="biat-form-section">
@@ -368,6 +358,128 @@
       </div>
     </form>
   </div>
+
+  <script>
+    const departementData = {
+      "Vie": {
+        pole: "Assurance de Personnes",
+        produit: ["Epargne", "Prévoyance"],
+        systemes: {
+          "ARIMA": ["Profil 1", "Profil 2", "Profil 3"]
+        }
+      },
+      "Santé": {
+        pole: "Assurance de Personnes",
+        produit: ["Santé"],
+        systemes: {
+          "AGORA": ["Profil 1", "Profil 2", "Profil 3"],
+          "ESP ASS": ["Profil 1", "Profil 2", "Profil 3"],
+          "SQL Santé": ["Profil 1", "Profil 2", "Profil 3"]
+        }
+      },
+      "Non-Vie": {
+        pole: "Assurance Dommages et Responsabilités",
+        produit: ["Automobile", "IRDS", "Incendie", "Risques Divers", "Responsabilité Civile", "Transports", "Accident Corporel", "Assistances", "Construction"],
+        systemes: {
+          "ARIMA": ["Profil 1", "Profil 2", "Profil 3"]
+        }
+      },
+      "Réseaux et Animation Commerciale": {
+        pole: "Commercial",
+        produit: ["Commercial"],
+        systemes: { "ARIMA": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "Bancassurance": {
+        pole: "Commercial",
+        produit: ["Commercial"],
+        systemes: { "ARIMA": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "Division Marketing Communication et Parcours Clients": {
+        pole: "Commercial",
+        produit: ["Commercial"],
+        systemes: { "ARIMA": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "Comptabilité": {
+        pole: "Comptabilité, contrôle de gestion et Recouvrement",
+        produit: ["Comptabilité"],
+        systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "Recouvrement": {
+        pole: "Comptabilité, contrôle de gestion et Recouvrement",
+        produit: ["Recouvrement"],
+        systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "Budget et Contrôle de gestion": {
+        pole: "Comptabilité, contrôle de gestion et Recouvrement",
+        produit: ["Budget/CG"],
+        systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] }
+      },
+      "SI": { pole: "Transformation et Organisation", produit: ["SI"], systemes: { } },
+      "MOA et Organisation": { pole: "Transformation et Organisation", produit: ["MOA"], systemes: { } },
+      "RH et Moyens Généraux": { pole: "Financier, RH, Logistique et Contentieux", produit: ["RH"], systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] } },
+      "Juridique et CTX": { pole: "Financier, RH, Logistique et Contentieux", produit: ["Juridique"], systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] } },
+      "Financier": { pole: "Financier, RH, Logistique et Contentieux", produit: ["Financier"], systemes: { "SAGE": ["Profil 1", "Profil 2", "Profil 3"] } }
+    };
+
+  
+    function updatePole() {
+      const departementSelect = document.getElementById("departement");
+      const poleInput = document.getElementById("pole");
+      const produitSelect = document.getElementById("produit");
+      const sousTypeDiv = document.getElementById("sousType");
+
+      const selectedDep = departementSelect.value;
+      const data = departementData[selectedDep];
+
+      // mettre à jour le pôle
+      poleInput.value = data ? data.pole : "";
+
+      // mettre à jour le produit
+      produitSelect.innerHTML = '<option value="">-- Sélectionner un produit --</option>';
+      if (data && data.produit) {
+        data.produit.forEach(p => {
+          produitSelect.innerHTML += `<option value="${p}">${p}</option>`;
+        });
+      }
+
+      // mettre à jour les systèmes
+      sousTypeDiv.innerHTML = "";
+      if (data && data.systemes) {
+        Object.entries(data.systemes).forEach(([system, profiles]) => {
+          const card = document.createElement("div");
+          card.className = "biat-system-card mb-3";
+
+          const header = document.createElement("div");
+          header.className = "biat-system-header";
+          header.innerHTML = `<strong>${system}</strong>`;
+          card.appendChild(header);
+
+          profiles.forEach(profile => {
+            const row = document.createElement("div");
+            row.className = "d-flex align-items-center justify-content-between mb-2";
+            row.innerHTML = `
+              <label class="me-3">${profile}</label>
+              <div class="d-flex gap-3">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="profils_env[${system}][${profile}][]" value="TEST">
+                  <label class="form-check-label">TEST</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="profils_env[${system}][${profile}][]" value="PROD">
+                  <label class="form-check-label">PROD</label>
+                </div>
+              </div>
+            `;
+            card.appendChild(row);
+          });
+
+          sousTypeDiv.appendChild(card);
+        });
+      }
+    }
+
+  </script>
+  
 
   <!-- Pass profiles_dict as JSON to JS -->
   <script>

@@ -357,7 +357,9 @@ def view_demande(request_id):
         "pole": row[13] or "",
         "nom_complet": row[14] or "",
         "matricule": row[15] or "",
-        "email": row[16] or ""
+        "email": row[16] or "",
+        # If you have "produit" in your form, but not in DB, add:
+        "produit": row[17] if len(row) > 17 else "",
     }
     demande["demandeur"] = demande["nom_complet"]
 
@@ -409,7 +411,7 @@ def view_demande(request_id):
     for key in [
         "objet_demande", "date_demande", "demandeur", "departement", "pole", "collaborator_type",
         "date_debut_stage", "date_fin_stage", "nom_complet", "matricule", "email",
-        "branches", "profils_env", "network_access", "acces_partages"
+        "branches", "profils_env", "network_access", "acces_partages", "produit"
     ]:
         if key not in demande:
             if key in ["branches", "network_access"]:
@@ -418,6 +420,34 @@ def view_demande(request_id):
                 demande[key] = {}
             else:
                 demande[key] = ""
+
+    # ---- SYSTEMS SECTION FOR TEMPLATE ----
+    # Build demande['systemes'] for display in view_demande.html
+    cursor.execute("""
+        SELECT s.name as system, p.name as profile, rsp.environment
+        FROM request_system_profiles rsp
+        JOIN systems s ON rsp.system_id = s.id
+        JOIN profiles p ON rsp.profile_id = p.id
+        WHERE rsp.request_id = ?
+        ORDER BY s.name, p.name, rsp.environment
+    """, (request_id,))
+    system_rows = cursor.fetchall()
+    print("DEBUG system_rows:", system_rows)  # <<< DEBUG PRINT
+    systemes_dict = {}
+    for system, profile, env in system_rows:
+        if system not in systemes_dict:
+            systemes_dict[system] = {}
+        if profile not in systemes_dict[system]:
+            systemes_dict[system][profile] = []
+        systemes_dict[system][profile].append(env)
+    # Transform for template
+    demande['systemes'] = []
+    for system, profils in systemes_dict.items():
+        demande['systemes'].append({
+            'system': system,
+            'profils': [{'nom': profile, 'envs': envs} for profile, envs in profils.items()]
+        })
+    print("DEBUG demande['systemes']:", demande['systemes'])  # <<< DEBUG PRINT
 
     conn.close()
     return render_template(
@@ -767,22 +797,21 @@ def validate_request(request_id):
         if action == 'valider':
             cursor.execute("UPDATE requests SET status=? WHERE id=?", ('validé', request_id))
             cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'validé', ?, ?)", (request_id, validator_id, comment))
-            # Notify informatique if validator is not informatique
-            if user_row[1] != 'informatique':
-                cursor.execute("SELECT email FROM users WHERE role='informatique' LIMIT 1")
-                info_email = cursor.fetchone()
-                if info_email:
-                    msg_info = EmailMessage()
-                    msg_info['Subject'] = 'Nouvelle demande à traiter'
-                    msg_info['From'] = 'haroun.riiahii@gmail.com'
-                    msg_info['To'] = info_email[0]
-                    msg_info.set_content("Une demande est à traiter. Rendez-vous sur la page /informatique/requests.")
-                    try:
-                        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                            smtp.login('haroun.riiahii@gmail.com', 'hukreegcgmihoybi')
-                            smtp.send_message(msg_info)
-                    except Exception as e:
-                        print("[ERROR] Email to informatique error:", e)
+                # Notify informatique (toujours)
+            cursor.execute("SELECT email FROM users WHERE role='informatique'")
+            info_emails = cursor.fetchall()
+            for info_email in info_emails:
+                msg_info = EmailMessage()
+                msg_info['Subject'] = 'Nouvelle demande à traiter'
+                msg_info['From'] = 'haroun.riiahii@gmail.com'
+                msg_info['To'] = info_email[0]
+                msg_info.set_content("Une demande est à traiter. Rendez-vous sur la page /informatique/requests.")
+                try:
+                    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                        smtp.login('haroun.riiahii@gmail.com', 'hukreegcgmihoybi')
+                        smtp.send_message(msg_info)
+                except Exception as e:
+                    print("[ERROR] Email to informatique error:", e)
         elif action == 'rejeter':
             cursor.execute("UPDATE requests SET status=?, rejection_comment=? WHERE id=?", ('rejeté', comment, request_id))
             cursor.execute("INSERT INTO request_history (request_id, action, actor_id, comment) VALUES (?, 'rejeté', ?, ?)", (request_id, validator_id, comment))
@@ -843,6 +872,21 @@ def cloturer_request(request_id):
         if user_row:
             info_id = user_row[0]
             cursor.execute("INSERT INTO request_history (request_id, action, actor_id) VALUES (?, 'clôturée', ?)", (request_id, info_id))
+        # Récupère l'email du demandeur
+        cursor.execute("SELECT u.email FROM requests r JOIN users u ON r.user_id=u.id WHERE r.id=?", (request_id,))
+        demandeur_email = cursor.fetchone()
+        if demandeur_email:
+            msg_dem = EmailMessage()
+            msg_dem['Subject'] = 'Votre demande a été clôturée'
+            msg_dem['From'] = 'haroun.riiahii@gmail.com'
+            msg_dem['To'] = demandeur_email[0]
+            msg_dem.set_content("Votre demande vient d'être clôturée par le responsable.")
+            try:
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                    smtp.login('haroun.riiahii@gmail.com', 'hukreegcgmihoybi')
+                    smtp.send_message(msg_dem)
+            except Exception as e:
+                print("[ERROR] Email clôture to demandeur error:", e)
         conn.commit()
     flash("Demande clôturée.", "success")
     return redirect(url_for('view_demande', request_id=request_id))
